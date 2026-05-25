@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador ICA 63-33</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Painel de Fadiga ATC (ICA 63-33)</h1>
+            <p>Gerenciamento regulamentar de limites operacionais e janelas de repouso.</p>
+        </header>
+
+        {% if erro %}
+            <div class="alerta erro">{{ erro }}</div>
+        {% endif %}
+
+        <div class="grid-paineis">
+            <section class="card">
+                <h2>1. Monitoramento do Turno Ativo</h2>
+                <p class="descricao">Insira o horário em que o controlador assumiu a posição para calcular o limite contínuo de tela.</p>
+                <form method="POST">
+                    <input type="hidden" name="aba" value="turno">
+                    <label for="hora_entrada">Horário de Entrada (HH:MM):</label>
+                    <input type="time" id="hora_entrada" name="hora_entrada" required>
+                    <button type="submit" class="btn">Calcular Limite</button>
+                </form>
+
+                {% if monitoria %}
+                    <div class="resultado status-verde">
+                        <p><strong>Entrada na Posição:</strong> {{ monitoria.entrada }} LT</p>
+                        <p><strong>Horário Limite de Tela:</strong> {{ monitoria.limite }} LT</p>
+                        <small>Aviso: Rendição obrigatória antes de completar 2 horas consecutivas.</small>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <h2>2. Calculadora de Repouso Obrigatório</h2>
+                <p class="descricao">Calcule o intervalo regulamentar de não trabalho antes do início da próxima escala de serviço.</p>
+                <form method="POST">
+                    <input type="hidden" name="aba" value="repouso">
+                    <label for="hora_termino">Horário de Término (HH:MM):</label>
+                    <input type="time" id="hora_termino" name="hora_termino" required>
+                    
+                    <label for="tipo_plantao">Classificação do Plantão:</label>
+                    <select id="tipo_plantao" name="tipo_plantao" required>
+                        <option value="diurno">Diurno (Sem atividade entre 01h30 e 05h29)</option>
+                        <option value="noturno">Noturno / Toque no PCRCC (Abrange 01h30 às 05h29)</option>
+                    </select>
+                    
+                    <button type="submit" class="btn">Calcular Janela</button>
+                </form>
+
+                {% if repouso %}
+                    <div class="resultado status-azul">
+                        <p><strong>Término do Serviço:</strong> {{ repouso.termino }} LT</p>
+                        <p><strong>Período Exigido:</strong> {{ repouso.horas }} horas de descanso</p>
+                        <p><strong>Liberado para Escala a partir de:</strong> {{ repouso.liberacao }} LT</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+
+</body>
+</html>
